@@ -1,12 +1,23 @@
 version: '3.8'
 
 services:
-  lumina-manager:
+  lumina-frontend:
     build: .
-    container_name: lumina_asset_manager
+    container_name: lumina_frontend
     ports:
-      - "80:80"
+      - "8081:80"
+    restart: always
+
+  lumina-api:
+    image: node:20-alpine
+    container_name: lumina_api
+    working_dir: /app
     volumes:
-      - .:/usr/share/nginx/html
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./server.js:/app/server.js
+      - ./package.json:/app/package.json
+      - ./node_modules:/app/node_modules
+      - /home/abimael/projetos/AutomatedPythonVideoMaker/cache:/data
+    ports:
+      - "3001:3001"
+    command: node server.js
     restart: always

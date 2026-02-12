@@ -1,11 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
+import './index.css';
 
-// Polyfill process.env if it doesn't exist to avoid reference errors
-// Fix: Cast window to any to avoid "Property 'process' does not exist on type 'Window'" error
 if (typeof window !== 'undefined' && !(window as any).process) {
-  // Fix: Cast window to any to assign a value to the 'process' property
   (window as any).process = { env: {} };
 }
 
