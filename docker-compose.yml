@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  lumina-manager:
+    build: .
+    container_name: lumina_asset_manager
+    ports:
+      - "80:80"
+    volumes:
+      - .:/usr/share/nginx/html
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    restart: always

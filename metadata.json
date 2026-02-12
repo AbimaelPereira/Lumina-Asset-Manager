@@ -1,0 +1,5 @@
+{
+  "name": "Lumina Remote Asset Manager",
+  "description": "A minimalist, premium dark mode management system for remote media assets organized by unique slugs, featuring real-time previews and hybrid persistence architecture.",
+  "requestFramePermissions": []
+}
