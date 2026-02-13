@@ -1,94 +1,91 @@
-
 import React from 'react';
 import { ICONS } from '../constants';
 import { MediaAsset } from '../types';
 
-interface MediaDetailModalProps {
+interface Props {
   asset: MediaAsset | null;
   onClose: () => void;
   onToggleStatus: (id: string) => void;
 }
 
-const MediaDetailModal: React.FC<MediaDetailModalProps> = ({ asset, onClose, onToggleStatus }) => {
+const MediaDetailModal: React.FC<Props> = ({ asset, onClose, onToggleStatus }) => {
   if (!asset) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-12 bg-black/95 animate-in zoom-in-95 duration-300">
-      <div className="bg-[#0f0f0f] border border-[#2a2a2a] rounded-3xl w-full max-w-6xl h-full flex flex-col md:flex-row overflow-hidden shadow-2xl relative">
-        <button onClick={onClose} className="absolute top-6 right-6 z-20 p-2 rounded-full bg-black/50 text-white hover:bg-white hover:text-black transition-all">
-          {ICONS.Close}
-        </button>
-
-        <div className="flex-1 bg-black flex items-center justify-center p-4 overflow-hidden">
-          {asset.type === 'video' ? (
-            <video controls className="max-w-full max-h-full">
-              <source src={asset.url} />
-            </video>
-          ) : (
-            <img 
-              src={asset.url} 
-              alt="" 
-              className="max-w-full max-h-full object-contain drop-shadow-2xl"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = 'https://via.placeholder.com/800x450?text=Failed+to+Load+Remote+Media';
-              }}
-            />
-          )}
+    <div 
+      className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto" 
+      onClick={onClose}
+    >
+      <div 
+        className="bg-[#161616] border border-[#2a2a2a] rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto my-auto" 
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-start justify-between mb-6 sticky top-0 bg-[#161616] pb-4 border-b border-[#2a2a2a] z-10">
+          <h2 className="text-2xl font-light text-white">Asset Details</h2>
+          <button 
+            onClick={onClose} 
+            className="text-zinc-500 hover:text-white transition-colors rotate-45"
+          >
+            {ICONS.Plus}
+          </button>
         </div>
 
-        <div className="w-full md:w-80 border-l border-[#2a2a2a] flex flex-col bg-[#161616]">
-          <div className="p-8 border-b border-[#2a2a2a]">
-            <h3 className="text-xl font-light text-white mb-1">Asset Metadata</h3>
-            <p className="text-zinc-500 text-xs font-light tracking-tight truncate max-w-full" title={asset.url}>{asset.url}</p>
+        <div className="space-y-6">
+          {asset.type === 'video' ? (
+            <div className="aspect-video bg-black rounded-lg flex items-center justify-center overflow-hidden">
+              <video src={asset.url} controls className="w-full h-full rounded-lg" />
+            </div>
+          ) : (
+            <div className="w-full rounded-lg overflow-hidden bg-black flex items-center justify-center max-h-[60vh]">
+              <img 
+                src={asset.url} 
+                alt="" 
+                className="max-w-full max-h-[60vh] object-contain rounded-lg" 
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = 'https://via.placeholder.com/400/161616/666666?text=Error+Loading';
+                }}
+              />
+            </div>
+          )}
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-xs uppercase text-zinc-500 mb-2 font-bold tracking-widest">Type</p>
+              <p className="text-white font-light">{asset.type}</p>
+            </div>
+            <div>
+              <p className="text-xs uppercase text-zinc-500 mb-2 font-bold tracking-widest">Extension</p>
+              <p className="text-white font-light">{asset.extension}</p>
+            </div>
+            <div className="col-span-2">
+              <p className="text-xs uppercase text-zinc-500 mb-2 font-bold tracking-widest">URL</p>
+              <p className="text-zinc-400 text-sm font-mono break-all bg-[#0f0f0f] p-3 rounded-lg border border-[#2a2a2a]">
+                {asset.url}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs uppercase text-zinc-500 mb-2 font-bold tracking-widest">Last Used</p>
+              <p className="text-white font-light">{asset.lastUsed || 'N/A'}</p>
+            </div>
+            <div>
+              <p className="text-xs uppercase text-zinc-500 mb-2 font-bold tracking-widest">Status</p>
+              <p className={`font-light ${asset.isInvalid ? 'text-red-500' : 'text-emerald-500'}`}>
+                {asset.isInvalid ? 'Invalid' : 'Valid'}
+              </p>
+            </div>
           </div>
 
-          <div className="flex-1 p-8 space-y-6 overflow-y-auto">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <span className="text-[10px] uppercase font-bold text-zinc-500">Mime Type</span>
-                <p className="text-sm font-medium text-white">{asset.type.toUpperCase()}</p>
-              </div>
-              <div className="space-y-1">
-                <span className="text-[10px] uppercase font-bold text-zinc-500">Extension</span>
-                <p className="text-sm font-medium text-white">.{asset.extension.toLowerCase()}</p>
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <span className="text-[10px] uppercase font-bold text-zinc-500">Last Used In Production</span>
-              <p className="text-sm font-medium text-white">{asset.lastUsed}</p>
-            </div>
-
-            <div className="space-y-1">
-              <span className="text-[10px] uppercase font-bold text-zinc-500">Internal ID</span>
-              <p className="text-xs font-mono text-zinc-400">{asset.id}</p>
-            </div>
-
-            <div className="pt-6 border-t border-[#2a2a2a]">
-              <div className="flex items-center justify-between">
-                <div>
-                  <span className="text-[10px] uppercase font-bold text-zinc-500">Mark as Invalid</span>
-                  <p className="text-xs text-zinc-600 font-light">Exclude from active API delivery</p>
-                </div>
-                <button 
-                  onClick={() => onToggleStatus(asset.id)}
-                  className={`w-12 h-6 rounded-full transition-colors relative flex items-center p-1 ${asset.isInvalid ? 'bg-red-500' : 'bg-zinc-800'}`}
-                >
-                  <div className={`w-4 h-4 bg-white rounded-full shadow-md transition-transform ${asset.isInvalid ? 'translate-x-6' : 'translate-x-0'}`}></div>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-8 border-t border-[#2a2a2a] bg-[#1a1a1a]/50">
-            <button 
-              className="w-full py-3 rounded-xl bg-white/5 border border-[#2a2a2a] text-white text-sm font-medium hover:bg-white hover:text-black transition-all flex items-center justify-center gap-2"
-              onClick={() => window.open(asset.url, '_blank')}
-            >
-              {ICONS.Link} Open Source Link
-            </button>
-          </div>
+          <button
+            onClick={() => onToggleStatus(asset.id)}
+            className={`w-full px-6 py-3 rounded-lg font-medium transition-all ${
+              asset.isInvalid
+                ? 'bg-emerald-500 text-white hover:bg-emerald-600'
+                : 'bg-red-500 text-white hover:bg-red-600'
+            }`}
+          >
+            {asset.isInvalid ? 'Mark as Valid' : 'Mark as Invalid'}
+          </button>
         </div>
       </div>
     </div>

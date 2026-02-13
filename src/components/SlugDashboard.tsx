@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ICONS, COLORS } from '../constants';
@@ -12,7 +11,7 @@ const SlugDashboard: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setSlugs(assetService.getSlugs());
+    assetService.loadSlugs().then(setSlugs);
   }, []);
 
   const filteredSlugs = slugs.filter(s => 
@@ -30,13 +29,14 @@ const SlugDashboard: React.FC = () => {
     };
     const updated = [...slugs, newSlug];
     assetService.saveSlugs(updated);
+    setSlugs(updated);
     navigate(`/edit/${newSlug.id}`);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     const updated = slugs.filter(s => s.id !== id);
     setSlugs(updated);
-    assetService.saveSlugs(updated);
+    await assetService.saveSlugs(updated);
   };
 
   return (
