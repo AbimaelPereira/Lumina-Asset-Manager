@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { ICONS, COLORS } from '../constants';
 import { Slug } from '../types';
 import { assetService } from '../services/assetService';
+import AddSlugModal from './AddSlugModal';
 
 const SlugDashboard: React.FC = () => {
   const [slugs, setSlugs] = useState<Slug[]>([]);
   const [search, setSearch] = useState('');
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,11 +21,32 @@ const SlugDashboard: React.FC = () => {
     s.description.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleCreate = () => {
+  const handleCreateFromJSON = (jsonData: any[]) => {
+    const newSlugs: Slug[] = jsonData.map(data => ({
+      id: Math.random().toString(36).substr(2, 9),
+      name: data.slug,
+      description: data.description,
+      assets: data.media.map((url: string) => ({
+        id: Math.random().toString(36).substr(2, 9),
+        url,
+        type: url.match(/\.(mp4|webm|ogg)$/i) ? 'video' : 'image',
+        extension: url.split('.').pop() || 'unknown',
+        lastUsed: new Date().toISOString().split('T')[0],
+        isInvalid: false
+      })),
+      createdAt: new Date().toISOString()
+    }));
+    
+    const updated = [...slugs, ...newSlugs];
+    assetService.saveSlugs(updated);
+    setSlugs(updated);
+  };
+
+  const handleCreateEmpty = (slugName: string) => {
     const newSlug: Slug = {
       id: Math.random().toString(36).substr(2, 9),
-      name: 'new-slug-' + Math.floor(Math.random() * 1000),
-      description: 'Newly created asset group.',
+      name: slugName,
+      description: 'Novo grupo de assets criado.',
       assets: [],
       createdAt: new Date().toISOString()
     };
@@ -47,7 +70,7 @@ const SlugDashboard: React.FC = () => {
           <p className="text-zinc-500 font-light text-sm">Manage and organize your remote media metadata efficiently.</p>
         </div>
         <button 
-          onClick={handleCreate}
+          onClick={() => setIsAddModalOpen(true)}
           className="bg-white text-black px-6 py-2.5 rounded-full flex items-center gap-2 font-medium hover:scale-105 transition-transform"
         >
           {ICONS.Plus}
@@ -123,6 +146,13 @@ const SlugDashboard: React.FC = () => {
           </tbody>
         </table>
       </div>
+
+      <AddSlugModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onCreateFromJSON={handleCreateFromJSON}
+        onCreateEmpty={handleCreateEmpty}
+      />
     </div>
   );
 };

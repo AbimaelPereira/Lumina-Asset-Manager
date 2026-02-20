@@ -17,6 +17,7 @@ const Sidebar: React.FC = () => {
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
         className="absolute -right-3 top-6 w-6 h-6 bg-[#1a1a1a] border border-[#2a2a2a] rounded-full flex items-center justify-center text-zinc-500 hover:text-white hover:border-zinc-500 transition-all z-50 shadow-lg hover:shadow-xl"
+        title={isCollapsed ? 'Expandir sidebar' : 'Recolher sidebar'}
       >
         <svg className={`w-3 h-3 transition-transform ${isCollapsed ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
